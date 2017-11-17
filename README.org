@@ -1,0 +1,13 @@
+* Rudolph
+** Abstract
+Rudolph is a home-made LED "strip" functioning as Christmas lights. It is controlled by a cluster of Arduino Nanos and can display different patterns.
+
+** Setup
+This project uses [[http://docs.platformio.org][PlatformIO]] to configure the Arduinos. To upload the program to an Arduino, simply run
+#+BEGIN_SRC sh
+cd arduino
+platformio run --target upload
+#+END_SRC
+
+** Documentation
+For documentation take a look at the [[file:doc/index.org][doc]] folder.

@@ -1,0 +1,130 @@
+* Documentation
+** Table of Contents
+1. [[System Architecture]]
+2. [[Parts]]
+3. [[Circuit]]
+4. [[Inter-Arduino communication]]
+5. [[Patterns]]
+
+** System Architecture
+*** Systems Diagram
+#+CAPTION: Systems Diagram
+#+NAME: fig:systems-diagram
+[[./systems-diagram.png]]
+
+*** Architecture
+The system architecture is sketched in [[fig:systems-diagram]].
+There are 5 Arduinos, connected by one wire for unidirectional communication. One of the Arduinos is designated as Master, the rest are slaves. The master takes user input as well as the motion sensor input to determine what patterns should be displayed (if any).
+
+*** TODO Interfaces
+It then passes this information on to the first slave, which passes it on to the second slave and so on. The protocol for this is described in [[Inter-Arduino communication]].
+
+Every time a cycle of the pattern starts, the Master tells the slaves to start the cycle. This should ensure sufficient synchronisation since the delays in message passing should be negligible, however the impact of the delay still needs to be measured.
+
+
+** Parts
+*** TODO Table
+#+CAPTION: List of parts
+#+NAME: tab:parts-list
+| Part                           | Count | Documentation | Purpose                             |
+|--------------------------------+-------+---------------+-------------------------------------|
+| Arduino Nano Atmega 328P clone |     5 | [[https://store.arduino.cc/usa/arduino-nano][Link]]          | Controlling + driving the LEDs      |
+| 5V 3A PSU by TASVICOO          |     1 | [[https://www.amazon.de/gp/product/B0713YRS8Z/ref=oh_aui_detailpage_o00_s00?ie=UTF8&psc=1][Amazon Link]]   | Supplying all 5 Arduinos with power |
+| HC-SR501 PIR Motion Sensor     |     1 | [[https://www.mpja.com/download/31227sc.pdf][Link]]          | Triggering Rudolph                  |
+| Various color LEDs by Elegoo   |    40 | [[file:Elegoo LED datasheet/index.org][Link]]          | Being LEDs                          |
+| Resistors (TODO: Resistance)   |  TODO | TODO          | TODO                                |
+| Buttons (TODO: Which?)         |  TODO | TODO          | TODO                                |
+*** TODO Explanation
+
+** Circuit
+*** Partial Circuits
+#+CAPTION: Master circuit
+#+NAME: fig:circuit-master
+#+ATTR_ORG: :width 500
+[[./schematics/master.png]]
+
+#+CAPTION: Slave circuit (intermediate)
+#+NAME: fig:circuit-slave-intermediate
+#+ATTR_ORG: :width 700
+[[./schematics/slave-intermediate.png]]
+
+#+CAPTION: Slave circuit (final)
+#+NAME: fig:circuit-slave-final
+#+ATTR_ORG: :width 600
+[[./schematics/slave-final.png]]
+
+*** Complete Circuit
+#+CAPTION: Complete circuit
+#+NAME: fig:circuit-combined
+#+ATTR_ORG: :width 800
+[[./schematics/combined.png]]
+
+*** TODO Explanation
+
+*** TODO LED Brightness
+The LEDs we chose vary quite a lot in brightness depending on the type of LED. For example, the clear 5mm white LEDs have 12000-14000 mcd, while the diffuse yellow LEDs have only 400-500 mcd.
+The different brightnesses (at a forward current of 20 mA, according to [[file:./Elegoo LED datasheet/index.org][the datasheets]]) are listed in [[tab:led-brightness]]. The /min/ and /max/ columns list minimum and maximum luminous intensity in mcd respectively. The /Number/ column lists how many of these LEDs would be necessary to achieve a luminous intensity of 5000 mcd, which was calculated using the [[./scripts/calc-led-number.py]] script. The script used the average of the minimum and maximum brightness, however it appears as though the minimum and maximum brightness are achieved at minimum and maximum forward voltage respectively, so we could instead calculate with the maximum brightness to reduce the number of LEDs.
+
+#+CAPTION: LED Brightness values
+#+NAME: tab:led-brightness
+| Type      | Color  |   Min |   Max | Number |
+|-----------+--------+-------+-------+--------|
+| 3mm clear | White  |  3000 |  7000 |      1 |
+| 3mm clear | Red    |   800 |  1000 |    5.6 |
+| 3mm clear | Green  |   800 |  1000 |    5.6 |
+| 3mm clear | Blue   |  1000 |  3500 |    2.2 |
+| 3mm clear | Yellow |   300 |   600 |   11.1 |
+|-----------+--------+-------+-------+--------|
+| 5mm clear | White  | 12000 | 14000 |    0.4 |
+| 5mm clear | Red    |  1000 |  3000 |    2.5 |
+| 5mm clear | Green  |  1500 |  1800 |      3 |
+| 5mm clear | Blue   |  6000 |  9000 |    0.7 |
+| 5mm clear | Yellow |  1500 |  2500 |    2.5 |
+|-----------+--------+-------+-------+--------|
+| Diffused  | White  |  4000 |  5000 |    1.1 |
+| Diffused  | Red    |   400 |   500 |   11.1 |
+| Diffused  | Green  |  3000 |  5000 |    1.3 |
+| Diffused  | Blue   |  6000 |  8000 |    0.7 |
+| Diffused  | Yellow |   400 |   500 |   11.1 |
+
+To get LEDs of different colors to be perceived at the same brightness, we could use multiple of them in parallel (the number being listed in the /Number/ column). However, since they all require roughly 20 mA and the Arduinos can only provide a maximum of 40 mA per port, this would require extra transistors to drive more than 2 LEDs.
+
+*** Resistor values
+The LEDs have different forward voltages according to [[file:./Elegoo LED datasheet/index.org][the datasheets]], however they all work around a forward current of 20 mA. To account for the different voltages, we should (optimally) use slightly different resistor values.
+To calculate the resistance, we use the maximum forward voltage $U_{LED,max}$. The voltage over the resistor is then
+$$U_{R} = U_{tot} - U_{LED,max}$$
+$$U_{R} = \SI{5}{\volt} - U_{LED,max}$$
+To calculate the resistance we can then use
+$$R = \frac{U}{I}$$
+$$R = \frac{\SI{5}{\volt} - U_{LED,max}}{\SI{20}{\milli\ampere}}$$
+This calculation is automated in the script [[./scripts/calc-resistance.py]]
+
+In [[tab:resistor-values]], the calculated resistances are listed in the /Resistance/ column (in Ohm). The minimum and maximum forward voltage are listed in the /Min/ and /Max/ columns (in V) respectively.
+
+#+CAPTION: Resistor values
+#+NAME: tab:resistor-values
+| Type      | Color  | Min | Max | Resistance | Current* |
+|-----------+--------+-----+-----+------------+----------|
+| 3mm clear | White  | 3.0 | 3.4 |         80 |      7.3 |
+| 3mm clear | Red    | 1.8 | 2.4 |        130 |     11.8 |
+| 3mm clear | Green  | 3.0 | 3.4 |         80 |      7.3 |
+| 3mm clear | Blue   | 3.0 | 3.4 |         80 |      7.3 |
+| 3mm clear | Yellow | 2.0 | 2.2 |        140 |     12.7 |
+|-----------+--------+-----+-----+------------+----------|
+| 5mm clear | White  | 2.8 | 3.2 |         90 |      8.2 |
+| 5mm clear | Red    | 2.0 | 2.4 |        130 |     11.8 |
+| 5mm clear | Green  | 3.0 | 3.2 |         90 |      8.2 |
+| 5mm clear | Blue   | 2.8 | 3.2 |         90 |      8.2 |
+| 5mm clear | Yellow | 1.8 | 2.4 |        130 |     11.8 |
+|-----------+--------+-----+-----+------------+----------|
+| Diffused  | White  | 2.8 | 3.2 |         90 |      8.2 |
+| Diffused  | Red    | 2.0 | 2.2 |        140 |     12.7 |
+| Diffused  | Green  | 2.8 | 3.2 |         90 |      8.2 |
+| Diffused  | Blue   | 3.0 | 3.4 |         80 |      7.3 |
+| Diffused  | Yellow | 2.0 | 2.2 |        140 |     12.7 |
+
+Obviously, the resistances are all /very/ low. Since $I = \frac{U}{R}$, a higher resistance means a lower current and vice versa. According to the datasheets, most of the LEDs have a maximum forward current of 20 mA (although some can handle 30 mA). Thus, we can only decrease the current, i.e. increase the resistance. With a (fairly standard) resistance of 220 Ohm, the current would decrease for all LEDs. The calculation of the current is automated in [[./scripts/calc-current.py]], the results are listed in the /Current*/ column in [[tab:resistor-values]] (in mA).
+
+# Local Variables:
+# org-latex-packages-alist: (("" "siunitx" t))
+# End:

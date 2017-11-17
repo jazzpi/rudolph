@@ -1,0 +1,26 @@
+* Elegoo LED Datasheets
+This was taken from [[http://www.elegoo.com/tutorial/Elegoo%20LED%20datasheet.zip][Elegoo's website]]
+** Diffused
+ 1. [[file:1.White(Diffused)5mm.pdf][White]]
+ 2. [[file:2.Red(Diffused)5mm%20.pdf][Red]]
+ 3. [[file:3.Green(Diffused)5mm.pdf][Green]]
+ 4. [[file:4.Blue(Diffused)5mm.pdf][Blue]]
+ 5. [[file:5.Yellow(Diffused)5mm.pdf][Yellow]]
+** Clear 5mm
+ 1. [[file:12.White(Clear Transparent)5mm.pdf][White]]
+ 2. [[file:8.Red(Clear Transparent)5mm.pdf][Red]]
+ 3. [[file:11.Green(Clear Transparent)5mm.pdf][Green]]
+ 4. [[file:9.Blue(Clear Transparent)5mm.pdf][Blue]]
+ 5. [[file:10.Yellow(Clear Transparent)5mm.pdf][Yellow]]
+** Clear 3mm
+ 1. [[file:17.White(Clear Transparent)3mm.pdf][White]]
+ 2. [[file:13.Red(Clear Transparent)3mm.pdf][Red]]
+ 3. [[file:16.Green(Clear Transparent)3mm.pdf][Green]]
+ 4. [[file:14.Blue(Clear Transparent)3mm.pdf][Blue]]
+ 5. [[file:15.Yellow(Clear Transparent)3mm.pdf][Yellow]]
+** Special
+ 1. [[file:6.RGB%20CA%20(Common%20Anode)%205mm.pdf][RGB Common Anode]]
+ 2. [[file:7.RGB%20CC%20(Common%20Cathnode)%205mm.pdf][RGB Common Cathode]]
+ 3. [[file:18.RGB%20Fast%20Flashing%205mm.pdf][RGB Fast Flashing]]
+ 4. [[file:19.RGB%20Slow%20Flashing%205mm.pdf][RGB Slow Flashing]]
+ 5. [[file:20%20UV(Clear%20Transparent)5mm.pdf][UV]]
